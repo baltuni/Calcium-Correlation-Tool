@@ -1,76 +1,91 @@
-# README - Calcium Correlation Tool (Cell Segmentation and Tracking Analysis)
+# README - Calcium Correlation Tool (Cell Segmentation & Tracking Analysis)
 
-This repository contains Jupyter Notebooks and Python scripts for cell segmentation, tracking, and analysis using deep learning models (Cellpose) and various image processing techniques. The workflows are designed for time-lapse microscopy data, enabling users to analyze cell behavior over time.
+This repository provides a pipeline for **cell segmentation, tracking, and correlation analysis** in time-lapse microscopy data. Utilizing deep learning models like **Cellpose**, it enables precise segmentation and tracking of cells across frames, offering insights into their **morphological changes and fluorescence intensity variations** over time. The workflow includes **automated segmentation, interactive refinement via Napari, and correlation analysis** to uncover dynamic cellular behaviors.
 
-## Files Overview
+## Repository Overview
 
-### 1. `0_python_test.py`
-This script contains core functions for segmenting images using a pre-trained Cellpose model and tracking cell movements across frames. It includes:
-- **`get_segmentation`**: Segments images using Cellpose.
-- **`get_tracked_masks`**: Tracks segmented cells across time.
-- **Utilities for image preprocessing and saving segmented masks**.
+### `0_python_test.py`
+Core functions for **image segmentation and tracking** using a pre-trained Cellpose model:
+- **`get_segmentation`** – Segments images using Cellpose.
+- **`get_tracked_masks`** – Tracks segmented cells across time.
+- **Utilities** – Image preprocessing and saving segmented masks.
 
-### 2. `1_max_create_masks.ipynb`
-This notebook generates segmentation masks for time-lapse microscopy images and tracks cells across frames. It:
-- Loads raw microscopy image stacks (`.tif`).
+### `1_max_create_masks.ipynb`
+Generates segmentation masks and tracks cells in time-lapse microscopy images:
+- Loads raw `.tif` image stacks.
 - Applies **Cellpose** for segmentation.
-- Calls `get_tracked_masks` to maintain consistent cell labels over time.
-- Saves the segmentation masks for further analysis.
+- Calls `get_tracked_masks` to maintain consistent cell labels.
+- Saves segmentation masks for further analysis.
 
-### 3. `4_analyse_output_radius_circle_mass_modified.ipynb`
-This notebook processes the segmentation results and refines tracked cell data. It:
+### `4_analyse_output_radius_circle_mass_modified.ipynb`
+Processes segmentation results and refines tracked cell data:
 - Loads segmentation masks and raw images.
-- Extracts **common cells** (cells that persist across frames).
+- Extracts **common cells** across frames.
 - Filters out inconsistently segmented cells.
-- Provides **interactive visualization with Napari** for manual corrections.
-- Calculates **cell perimeter, radius, and mass** over time.
+- Provides **interactive visualization via Napari**.
+- Computes **cell perimeter, radius, and mass** over time.
 
-### 4. `6_correlation.ipynb`
-This notebook performs correlation analysis on tracked cell properties, such as fluorescence intensity and movement patterns. It:
-- Loads **pre-processed tracking data** (`.pkl` files) from previous steps.
+### `6_correlation.ipynb`
+Performs correlation analysis on **tracked cell properties**:
+- Loads **pre-processed tracking data** (`.pkl` files).
 - Computes **cross-correlations** between cell properties.
-- Visualizes the raw image and filtered segmentation masks.
+- Visualizes raw images and segmented masks.
 - Saves **correlation plots** for further analysis.
 
 ## Installation
 
-### Setting Up the Environment
-Before running the notebooks, activate the required Conda environment by running:
+### Environment Setup
+Activate the Conda environment before running the notebooks:
 ```bash
 conda activate cellpose
 ```
 
-### Creating a Model
-Before creating the model, use Napari to create the labels for training. You can open Napari by running the following command in the terminal:
+### Manual Segmentation
+Before training, **create labels using Napari**:
 ```bash
 napari
 ```
-Once Napari is open, drag the raw images into the viewer and manually create the labels.
+Once open, **drag raw images** into Napari and manually create labels.
 
-Ensure you have the raw and labeled images in the `cellpose_train` folder before you run the following code to create the model:
+### Creating a Model
+Ensure labeled images and raw images are in `cellpose_train`, then run:
 ```bash
 python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\Bestun\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
 ```
 
-### Prerequisites
-Ensure you pick the following kernel when running the notebooks:
+### Kernel Requirement
+Use the following Conda kernel when running notebooks:
+**`cellpose (Python 3.8.16)`**
 
-`cellpose (Python 3.8.16)`
+## Running the Notebooks
 
-### Running the Notebooks
-1. **Generate segmentation masks:**
-   - Run `1_max_create_masks.ipynb` to create cell segmentation masks.
-2. **Analyze and refine masks:**
-   - Run `4_analyse_output_radius_circle_mass_modified.ipynb` to refine segmentation and filter out unreliable cells.
-3. **Perform correlation analysis:**
-   - Run `6_correlation.ipynb` to analyze time-series cell behavior.
+### **1. Generate Segmentation Masks**
+Run `1_max_create_masks.ipynb` to:
+- Load raw images and apply **Cellpose segmentation**.
+- Track segmented cells across frames.
+- Save results as `.tif` files.
+
+### **2. Analyze & Refine Masks**
+Run `4_analyse_output_radius_circle_mass_modified.ipynb` to:
+- Load segmentation masks and filter unreliable cells.
+- Identify **common cells** across frames.
+- Compute **cell properties** (area, radius, intensity).
+- Visualize results interactively in **Napari**.
+- Save processed data for correlation analysis.
+
+### **3. Perform Correlation Analysis**
+Run `6_correlation.ipynb` to:
+- Load tracking data (`.pkl` files).
+- Extract **fluorescence intensity and movement metrics**.
+- Compute **cross-correlations** between cell behaviors.
+- Generate **correlation heatmaps and statistical summaries**.
+- Export results for further analysis.
 
 ## Usage
-This pipeline is designed for analyzing time-lapse microscopy images, particularly for:
-- **Tracking cell movement and shape changes.**
-- **Measuring fluorescence intensity variations over time.**
-- **Detecting correlations between cellular behaviors.**
+This pipeline is designed for **time-lapse microscopy image analysis**, specifically:
+- **Tracking cell movement and morphological changes**.
+- **Measuring fluorescence intensity variations over time**.
+- **Detecting correlations between cellular behaviors**.
 
 ## Contributing
-Feel free to submit issues or pull requests to improve this workflow.
-
+Contributions are welcome! Submit issues or pull requests to improve this workflow.
