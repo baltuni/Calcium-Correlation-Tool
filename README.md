@@ -33,17 +33,17 @@ This notebook performs correlation analysis on tracked cell properties, such as 
 - Saves **correlation plots** for further analysis.
 
 ## Installation
-### Prerequisites
-Ensure you have the following dependencies installed:
-```bash
-pip install numpy pandas matplotlib tifffile scipy cellpose skimage napari tqdm networkx
-```
 
 ### Creating a Model
-Ensure you have the raw and labeled images in the **cellpose_train** folder before you run the following code to create the model:
+Ensure you have the raw and labeled images in the `cellpose_train` folder before you run the following code to create the model:
 ```bash
 python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\Bestun\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
 ```
+
+### Prerequisites
+Ensure you pick the following kernel when running the notebooks:
+
+`cellpose (Python 3.8.16)`
 
 ### Running the Notebooks
 1. **Generate segmentation masks:**
