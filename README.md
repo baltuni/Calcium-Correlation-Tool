@@ -34,6 +34,12 @@ This notebook performs correlation analysis on tracked cell properties, such as 
 
 ## Installation
 
+### Setting Up the Environment
+Before running the notebooks, activate the required Conda environment by running:
+```bash
+conda activate cellpose
+```
+
 ### Creating a Model
 Ensure you have the raw and labeled images in the `cellpose_train` folder before you run the following code to create the model:
 ```bash
