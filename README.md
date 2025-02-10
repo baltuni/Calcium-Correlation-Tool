@@ -50,7 +50,7 @@ Once open, **drag raw images** into Napari and manually create labels.
 ### Creating a Model
 Ensure labeled images and raw images are in `cellpose_train`, then run:
 ```bash
-python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\Bestun\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
+python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\User\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
 ```
 
 ### Kernel Requirement
