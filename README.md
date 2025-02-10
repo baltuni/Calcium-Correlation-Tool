@@ -41,6 +41,12 @@ conda activate cellpose
 ```
 
 ### Creating a Model
+Before creating the model, use Napari to create the labels for training. You can open Napari by running the following command in the terminal:
+```bash
+napari
+```
+Once Napari is open, drag the raw images into the viewer and manually create the labels.
+
 Ensure you have the raw and labeled images in the `cellpose_train` folder before you run the following code to create the model:
 ```bash
 python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\Bestun\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
@@ -67,3 +73,4 @@ This pipeline is designed for analyzing time-lapse microscopy images, particular
 
 ## Contributing
 Feel free to submit issues or pull requests to improve this workflow.
+
