@@ -91,3 +91,36 @@ def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5, random_labels=Fal
         logging.info(f"Masks saved to {savedir} with name {name}_masks.tif")
     logging.info("Tracking complete.")
     return tracked_masks
+
+def get_common_cells(tracked_masks, occurrence=80):
+    """ Get the cells that appear in at least [occurrence] percent of images
+    
+    Parameters
+    ---------------
+    tracked_masks: 3D array
+        previously tracked segmentation masks
+    occurrence: int (optional)
+        the smallest percent of images that the cell is allowed to appear
+        in to still be taken into account
+    Returns
+    ---------------
+    commons: list
+        a list of labels of the cells that fullfill the given requirements of
+        how many images they need to appear in
+    counts: list
+        a list of the number of times a specific cell appears in the images,
+        in the same order as 'commons'
+    """
+
+    cell_labels = get_cell_labels(tracked_masks)
+    commons = []
+    counts = []
+    limit = (occurrence/100.)*len(tracked_masks)
+    cell_labels_flat = np.array([i for image in cell_labels for i in image])
+
+    for i in np.unique(cell_labels_flat):
+        count = np.count_nonzero(cell_labels_flat==i)
+        if count>=limit:
+            commons.append(i)
+            counts.append(count)
+    return np.array(commons), np.array(counts)
