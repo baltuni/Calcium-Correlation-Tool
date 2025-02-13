@@ -2,6 +2,8 @@
 
 This repository provides a pipeline for **cell segmentation, tracking, and correlation analysis** in time-lapse microscopy data. Utilizing deep learning models like **Cellpose**, it enables precise segmentation and tracking of cells across frames, offering insights into their **morphological changes and fluorescence intensity variations** over time. The workflow includes **automated segmentation, interactive refinement via Napari, and correlation analysis** to uncover dynamic cellular behaviors.
 
+![Image](https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/021024_cluster_3_25.pdf?raw=true)
+
 ## Repository Overview
 
 ### `0_python_test.py`
