@@ -116,7 +116,7 @@ Once open, **drag raw images** into Napari and manually create labels.
 
 ### 📐 Creating a Model
 
-* Ensure the single-frame labeled images and single-frame raw images are in `cellpose_train`, then run:
+* Ensure the single-framed images (both raw and labeled) are in `cellpose_train`, then run:
 ```bash
 python -m cellpose --train --use_gpu --verbose --n_epochs 2000 --dir D:\User\training_images_for_cellpose\cellpose_train\ --img_filter _ --mask_filter _label --pretrained_model None
 ```
