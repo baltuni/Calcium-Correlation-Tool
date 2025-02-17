@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from datetime import date
 from scipy import ndimage
