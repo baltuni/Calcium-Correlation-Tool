@@ -10,7 +10,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 - **Tracking cell movement** across frames.
 - **Correlation analysis** to uncover dynamic cellular behaviors.
 
-![Image](https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/021024_cluster_3_25.png?raw=true)
+![Image](https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_image.png?raw=true)
 
 ## 🏗 Repository Overview
 
