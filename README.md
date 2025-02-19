@@ -25,7 +25,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 
 <summary>Detailed file descriptions</summary>
 
-#### **0_segmentation_utils.py**
+### `0_segmentation_utils.py`
 - Contains helper functions for cell segmentation.
 - Uses **Cellpose** for deep-learning-based segmentation.
 - Provides functions for:
@@ -34,7 +34,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
   - Post-processing segmented masks (e.g., filtering, smoothing).
   - Visualizing segmentation results.
 
-#### **1_generate_masks.ipynb**
+### `1_generate_masks.ipynb`
 - Implements the segmentation pipeline for generating cell masks.
 - Steps include:
   - Loading time-lapse microscopy data.
@@ -42,7 +42,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
   - Saving segmented masks for further analysis.
   - Interactive refinement using **Napari** for manual corrections.
 
-#### **2_tracking_refinement.ipynb**
+### `2_tracking_refinement.ipynb`
 - Tracks cell movements across time-lapse frames.
 - Key functionalities:
   - Assigns unique IDs to segmented cells in consecutive frames.
@@ -50,7 +50,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
   - Provides visualization tools for overlaying tracked paths.
   - Allows interactive refinement of cell tracks in **Napari**.
 
-#### **3_correlation_analysis.ipynb**
+### `3_correlation_analysis.ipynb`
 - Analyzes dynamic cell behaviors through correlation studies.
 - Includes:
   - Extracting fluorescence intensity over time for each cell.
