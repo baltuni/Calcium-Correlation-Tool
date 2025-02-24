@@ -97,7 +97,7 @@ User                                    # YourName
   │   ├── Model3                        # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
-  ├── output_path                       # folders with .pkl files are stored here
+  ├── pkl_data                          # folders with .pkl files are stored here
   │   ├── Model3                        # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
