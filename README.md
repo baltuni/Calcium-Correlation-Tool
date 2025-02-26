@@ -1,6 +1,6 @@
-<p align="left">
+<p align="center">
   <a href="https://github.com/baltuni/Calcium-Correlation-Tool">
-    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="35%"/>
+    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="100%"/>
   </a>
 </p>
 
