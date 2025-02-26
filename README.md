@@ -1,4 +1,11 @@
-# README - Calcium Correlation Tool 🔬
+<p align="center">
+  <a href="https://github.com/baltuni/Calcium-Correlation-Tool">
+    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="100%"/>
+  </a>
+</p>
+
+# Calcium Correlation Tool
+
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)  
 [![Python](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/)  
 [![Cellpose](https://img.shields.io/badge/cellpose-2.0-orange.svg)](https://github.com/MouseLand/cellpose)
