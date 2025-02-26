@@ -1,10 +1,10 @@
-<p align="left">
+# Calcium Correlation Tool
+
+<p align="center">
   <a href="https://github.com/baltuni/Calcium-Correlation-Tool">
-    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="50%"/>
+    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="100%"/>
   </a>
 </p>
-
-# Calcium Correlation Tool
 
 This repository provides a pipeline for **cell segmentation, tracking, and correlation analysis** in time-lapse microscopy data. Utilizing deep learning models like **Cellpose**, it enables precise segmentation and tracking of cells across frames, offering insights into their morphological changes and fluorescence intensity variations over time. The workflow includes:
 
