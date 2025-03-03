@@ -2,7 +2,7 @@
 
 <p align="left">
   <a href="https://github.com/baltuni/Calcium-Correlation-Tool">
-    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/readme_logo.png" width="100%"/>
+    <img loading="lazy" alt="CCT" src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/assets/readme_logo.png" width="100%"/>
   </a>
 </p>
 
