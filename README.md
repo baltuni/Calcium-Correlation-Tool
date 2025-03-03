@@ -1,7 +1,7 @@
 <div align="center">
   <br>
   </br>
-<img src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/assets/readme_logo.png" alt="CCT Logo"  width="500"/>
+<img src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/assets/readme_logo.png" alt="CCT Logo"  width="600"/>
   <br>
   </br>
 <h1>Calcium Correlation Tool</h1>
