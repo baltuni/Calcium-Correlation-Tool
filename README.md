@@ -85,7 +85,7 @@ conda activate cctenv
 
 ### 🗂️ Workflow
 
-It is recommended to download `Workflow.zip` and extract it somewhere on your workstation for better directory structure.
+It is recommended to download [`Workflow.zip`](https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/assets/Workflow.zip) and extract it somewhere on your workstation for better directory structure.
 
 <details>
 
