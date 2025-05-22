@@ -44,28 +44,28 @@ def _save_masks(masks, name=None, savedir=None):
     else:
         imwrite(f"{name}_masks.tif", masks)
 
-def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5, random_labels=False, save=False, name=None, savedir=None):
-    """ Track cells across frames and maintain consistent labeling. """
-    logging.info(f"Tracking started. Input masks shape: {masks.shape}")
+def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5,
+                      random_labels=False, save=False, name=None, savedir=None):
+    """Track cells across frames and maintain consistent labeling."""
     tracked_masks = np.zeros_like(masks)
     COMs, roi_labels = get_centers_of_mass(masks)
-    logging.info(f"Number of frames with centers of mass: {len(COMs)}")
-    
+
     if random_labels:
         tracked_masks[0] = assign_random_cell_labels(masks[0])
     else:
         tracked_masks[0] = masks[0]
-    
+
     used_labels = set(np.unique(tracked_masks[0]))
-    for imnr in tqdm(range(len(masks)), desc="Tracking masks", unit=" frames"):
-        logging.info(f"Processing frame {imnr}...")
+
+    for imnr in range(len(masks)):
         if imnr == 0:
             continue
+
         new_cells = 0
         ROI_labels_imnr = roi_labels[imnr]
         if len(COMs[imnr]) == 0:
-            logging.warning(f"No centers of mass detected in frame {imnr}. Skipping frame.")
             continue
+
         for COM_idx, COM_label in zip(range(len(COMs[imnr])), ROI_labels_imnr):
             ref_im_idx = -10
             for k in range(1, backtrack_limit):
@@ -76,21 +76,18 @@ def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5, random_labels=Fal
                     ref_im_idx = imnr - k
                     mcc = COMs[ref_im_idx][np.argmin(distances)]
                     cell_label = tracked_masks[ref_im_idx][round(mcc[0]), round(mcc[1])]
-                    logging.info(f"Frame {imnr}: Matched {COM_label} with label {cell_label} in frame {ref_im_idx}")
                     break
             if ref_im_idx == -10:
                 new_cells += 1
                 cell_label = np.max(tracked_masks[:imnr]) + new_cells
                 while cell_label in used_labels:
                     cell_label += 1
-                logging.info(f"Frame {imnr}: No match found. Assigned new label {cell_label}")
             used_labels.add(cell_label)
             tracked_masks[imnr][masks[imnr] == COM_label] = cell_label
-        logging.info(f"Frame {imnr} processed. Unique labels: {np.unique(tracked_masks[imnr])}")
+
     if save:
         _save_masks(tracked_masks, name=name, savedir=savedir)
-        logging.info(f"Masks saved to {savedir} with name {name}_masks.tif")
-    logging.info("Tracking complete.")
+
     return tracked_masks
 
 def get_common_cells(tracked_masks, occurrence=80):
