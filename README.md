@@ -96,22 +96,22 @@ It is recommended to download [`Workflow.zip`](https://github.com/baltuni/Calciu
 User                                    # YourName
   │
   ├── masks_tracked                     # folders with masked .tif files are stored here
-  │   ├── Model3                        # an instance of such a folder
+  │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
   ├── pkl_data                          # folders with .pkl files are stored here
-  │   ├── Model3                        # an instance of such a folder
+  │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
   ├── plots                             # plots are saved here
   │   └── latex                         # tex files for latex tables are saved here
   │
   ├── raw_data                          # folders with full framed raw .tif files
-  │   ├── Model3                        # an instance of such a folder
+  │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
   ├── saved_models                      # folders with cellpose models are stored here
-  │   ├── Model3                        # an instance of such a folder
+  │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
   └── training_images_for_cellpose      # used for cellpose training
