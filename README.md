@@ -18,9 +18,9 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 
 | 📂 File                      | 📌 Description                                          |
 | :--------------------------- | :-----------------------------------------------         |
-| 0_cct_utils.py               | Core segmentation & tracking functions (Cellpose)        |
+| 0_cct_utils.py               | Core segmentation, tracking, and analysis functions      |
 | 1_generate_masks.ipynb       | Generates segmentation masks from `.tif` images          |
-| 2_tracking_refinement.ipynb  | Filters, refines, and visualizes tracked cells           |
+| 2_tracking_refinement.ipynb  | Filters, refines, and saves tracked cell data            |
 | 3_correlation_analysis.ipynb | Performs correlation analysis on tracked cell properties |
 
 <details>
@@ -28,37 +28,43 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 <summary>Detailed file descriptions</summary>
 
 ### `0_cct_utils.py`
-- Contains helper functions for cell segmentation.
+- Contains core functions for cell segmentation, tracking, and correlation analysis.
 - Uses **Cellpose** for deep-learning-based segmentation.
 - Provides functions for:
-  - Image preprocessing before segmentation.
-  - Running segmentation models.
-  - Post-processing segmented masks (e.g., filtering, smoothing).
-  - Visualizing segmentation results.
+  - Preprocessing and running segmentation models.
+  - Tracking cells across frames (`track_Y`, `get_tracked_masks`).
+  - Filtering cell pairs by distance, smoothing intensities, and calculating cross-correlations.
+  - Building null distributions for statistical thresholding.
+  - Generating LaTeX tables and network visualizations of correlations.
+  - Calculating and visualizing centers of mass (COM) of cells.
 
 ### `1_generate_masks.ipynb`
 - Implements the segmentation pipeline for generating cell masks.
 - Steps include:
   - Loading time-lapse microscopy data.
-  - Running segmentation using **Cellpose**.
-  - Saving segmented masks for further analysis.
-  - Interactive refinement using **Napari** for manual corrections.
+  - Splitting the data into chunks for processing.
+  - Running segmentation using **Cellpose** on each chunk.
+  - Relabeling masks across chunks to ensure consistent tracking.
+  - Saving segmented masks as `.tif` files.
 
 ### `2_tracking_refinement.ipynb`
-- Tracks cell movements across time-lapse frames.
+- Refines segmented masks and tracks cells over time.
 - Key functionalities:
-  - Assigns unique IDs to segmented cells in consecutive frames.
-  - Corrects tracking errors using heuristic rules.
-  - Provides visualization tools for overlaying tracked paths.
-  - Allows interactive refinement of cell tracks in **Napari**.
+  - Filters cells by occurrence in frames (`get_common_cells`).
+  - Adds a **Napari Points Layer** for manual removal of incorrectly placed labels.
+  - Calculates cell intensities and centers of mass (COM) using `cct_utils`.
+  - Saves refined tracking data into `.pkl` files for correlation analysis.
 
 ### `3_correlation_analysis.ipynb`
 - Analyzes dynamic cell behaviors through correlation studies.
 - Includes:
-  - Extracting fluorescence intensity over time for each cell.
-  - Computing correlations between intensity signals of different cells.
-  - Filtering significant correlations for network analysis.
-  - Visualizing correlation networks with **Napari**.
+  - Loading `.pkl` tracking data and corresponding raw images and masks.
+  - Normalizing and smoothing cell intensity traces (`apply_smoothing_to_normalized`).
+  - Calculating cross-correlations between cells, filtering by distance, and identifying significant correlations.
+  - Building null distributions and determining statistical thresholds (`get_significant_correlation_threshold`).
+  - Generating LaTeX tables summarizing top and bottom correlations.
+  - Visualizing correlation networks and COMs in **Napari**.
+  - **Note**: Requires `.pkl` files generated from `2_tracking_refinement.ipynb`.
 
 </details>
 
@@ -164,28 +170,28 @@ code
 **Execute** `1_generate_masks.ipynb` **to segment cells in your microscopy data:**
 - Open the notebook in **VSCode**.
 - Load raw microscopy images from the specified directory.
-- Define segmentation parameters (`occurrence_limit`, `dist_limit`).
-- Use **Cellpose** to segment cells.
+- Run the segmentation pipeline using **Cellpose**, splitting large files into chunks.
+- Relabel masks across chunks for consistent cell tracking.
 - Run the segmentation pipeline and generate cell masks.
-- Save the segmented masks for further analysis.
+- Save segmented masks as `.tif` files.
 
-### **📗 Analyze & Refine Masks**
+### **📗 Track & Refine Masks**
 **Execute** `2_tracking_refinement.ipynb` **to track and refine cell segmentation:**
 - Load segmented masks from the previous step.
-- Use a tracking algorithm to assign unique IDs to cells across frames.
-- Apply filtering (`get_common_cells`) to remove unreliable labels.
-- Use **Napari** for manual correction of incorrectly placed labels.
-- Ensure temporal consistency of cell masks.
-- Save the refined segmentation and tracking results.
+- Filter cells by occurrence (`get_common_cells`).
+- Add a **Napari Points Layer** for manual removal of missegmented labels.
+- Calculate cell intensities and centers of mass using `cct_utils`.
+- Save the tracking and refinement results as `.pkl` files for correlation analysis.
+- Important: Ensure you have run `1_generate_masks.ipynb` before this.
 
-### **📘 Perform Correlation Analysis**
+### **📘 Correlation Analysis**
 **Execute** `3_correlation_analysis.ipynb` **to analyze fluorescence intensity correlations:**
-- Load `.pkl` files containing tracked cell data.
-- Load raw microscopy images and corresponding segmented masks.
-- Compute fluorescence intensity variations over time for each cell.
-- Perform correlation analysis between different cells.
-- Visualize and filter significant correlations using **Napari**.
-- Save correlation plots and tables for further analysis.
+- Load `.pkl` tracking data and corresponding raw images/masks.
+- Normalize and smooth intensity traces for each cell.
+- Calculate cross-correlations and identify significant correlations via null distribution.
+- Generate LaTeX tables of top and bottom correlation pairs.
+- Visualize correlation networks and centers of mass in **Napari**.
+- Important: Ensure you have run `2_tracking_refinement.ipynb` before this.
 
 </details>
 
@@ -196,7 +202,7 @@ code
 This pipeline is designed for **time-lapse microscopy image analysis**, specifically:
 - **Tracking cell movement and morphological changes**.
 - **Measuring fluorescence intensity variations over time**.
-- **Detecting correlations between cellular behaviors**.
+- **Detecting correlations and constructing interaction networks between cells.**.
 
 ---
 
