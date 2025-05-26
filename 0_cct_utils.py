@@ -229,10 +229,15 @@ def build_null_distribution(filtered_pairs, filtered_intensities, max_lag, num_p
     return np.array(null_distribution)
 
 def get_significant_correlation_threshold(sorted_correlations, null_distribution, p_value_threshold=0.05):
+    """
+    Find significant correlation threshold from null distribution and print it.
+    """
     for _, correlation in sorted_correlations:
         p_value = np.mean(null_distribution >= correlation)
         if p_value < p_value_threshold:
+            print(f"Significant threshold: {correlation} (p-value: {p_value})")
             return correlation, p_value
+    print("No significant threshold found with p-value below the threshold.")
     return None, None
 
 # Visualization Utilities
@@ -295,6 +300,57 @@ def plot_network_and_cell_coms_in_napari(
         plt.savefig(plot_file_path)
         plt.show()
         plt.close(fig)
+
+def shift_intensity_curve(intensities, time_lag):
+    num_frames = len(intensities)
+    shifted_intensity = np.full(num_frames, np.nan)
+    if time_lag > 0:
+        shifted_intensity[time_lag:] = intensities[:-time_lag]
+    elif time_lag < 0:
+        shifted_intensity[:time_lag] = intensities[-time_lag:]
+    else:
+        shifted_intensity = intensities.copy()
+    return shifted_intensity
+
+def plot_correlation_curve(correlation_data, frame_rate, cell1, cell2, max_lag):
+    time_lags_in_seconds = correlation_data['time_lags'] * (1 / frame_rate)
+    plt.figure(figsize=(12, 6))
+    plt.plot(time_lags_in_seconds, correlation_data['correlations'],
+             label=f'Correlation for Cell {cell1} vs Cell {cell2}', color='green')
+    plt.title(f'Cross-Correlation Curve for Cells {cell1} and {cell2}')
+    plt.xlabel('Time Lag (seconds)')
+    plt.ylabel('Cross-Correlation')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+def plot_intensity_curves(cell1, cell2, correlation_data, frame_rate, intensities_filtered):
+    intensities1 = intensities_filtered[cell1]
+    intensities2 = intensities_filtered[cell2]
+    max_corr_index = np.nanargmax(correlation_data['correlations'])
+    max_time_lag = correlation_data['time_lags'][max_corr_index]
+    shifted_intensities2 = shift_intensity_curve(intensities2, max_time_lag)
+
+    if max_time_lag > 0:
+        start_idx, end_idx = max_time_lag, len(intensities1)
+    elif max_time_lag < 0:
+        start_idx, end_idx = 0, len(intensities1) + max_time_lag
+    else:
+        start_idx, end_idx = 0, len(intensities1)
+
+    valid_intensities1 = intensities1[start_idx:end_idx]
+    valid_intensities2 = shifted_intensities2[start_idx:end_idx]
+    valid_time_axis = np.arange(start_idx, end_idx) / frame_rate / 60
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(valid_time_axis, valid_intensities1, label=f'Cell {cell1} Intensity', color='blue')
+    plt.plot(valid_time_axis, valid_intensities2, label=f'Cell {cell2} Intensity (shifted)', color='orange')
+    plt.title(f'Normalized Intensities for Cells {cell1} and {cell2} (Time Lag = {max_time_lag} frames)')
+    plt.xlabel('Time (minutes)')
+    plt.ylabel('Normalized Intensity')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 # Table Generation
 def create_and_save_table(pairs, table_title, file_name, export_path, min_correlations_filtered):
