@@ -16,9 +16,9 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 
 ## 🏗 Repository Overview
 
-| 📂 File                      | 📌 Description                                           |
+| 📂 File                      | 📌 Description                                          |
 | :--------------------------- | :-----------------------------------------------         |
-| 0_segmentation_utils.py      | Core segmentation & tracking functions (Cellpose)        |
+| 0_cct_utils.py               | Core segmentation & tracking functions (Cellpose)        |
 | 1_generate_masks.ipynb       | Generates segmentation masks from `.tif` images          |
 | 2_tracking_refinement.ipynb  | Filters, refines, and visualizes tracked cells           |
 | 3_correlation_analysis.ipynb | Performs correlation analysis on tracked cell properties |
@@ -27,7 +27,7 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 
 <summary>Detailed file descriptions</summary>
 
-### `0_segmentation_utils.py`
+### `0_cct_utils.py`
 - Contains helper functions for cell segmentation.
 - Uses **Cellpose** for deep-learning-based segmentation.
 - Provides functions for:
