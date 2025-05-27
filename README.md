@@ -4,7 +4,11 @@
 <img src="https://github.com/baltuni/Calcium-Correlation-Tool/blob/main/assets/readme_logo.png" alt="CCT Logo"  width="600"/>
   <br>
   </br>
-<h1>Calcium Correlation Tool</h1>
+<h1>Calcium Correlation Tool
+  
+![Version](https://img.shields.io/badge/version-1.0-blue.svg)
+![Last Updated](https://img.shields.io/badge/last%20updated-May%202025-green.svg)
+</h1>
 </div>
 
 This repository provides a pipeline for **cell segmentation, tracking, and correlation analysis** in time-lapse microscopy data. Utilizing deep learning models like **Cellpose**, it enables precise segmentation and tracking of cells across frames, offering insights into their morphological changes and fluorescence intensity variations over time. The workflow includes:
@@ -54,17 +58,19 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
   - Adds a **Napari Points Layer** for manual removal of incorrectly placed labels.
   - Calculates cell intensities and centers of mass (COM) using `cct_utils`.
   - Saves refined tracking data into `.pkl` files for correlation analysis.
+  - Adds a **Napari Points Layer** for manual removal of incorrect labels.
+  - Calculates cell intensities and COMs using `cct_utils`.
+  - Saves a **preprocessed mask** into the `correlation_masks` folder and generates a corresponding `.pkl` file.
 
 ### `3_correlation_analysis.ipynb`
-- Analyzes dynamic cell behaviors through correlation studies.
-- Includes:
-  - Loading `.pkl` tracking data and corresponding raw images and masks.
+- Analyzes dynamic cell behaviors through correlation studies using **preprocessed masks** and **tracking data** from `2_tracking_refinement.ipynb`.
+- Key steps include:
   - Normalizing and smoothing cell intensity traces (`apply_smoothing_to_normalized`).
-  - Calculating cross-correlations between cells, filtering by distance, and identifying significant correlations.
+  - Calculating cross-correlations, filtering by distance, and identifying significant correlations.
   - Building null distributions and determining statistical thresholds (`get_significant_correlation_threshold`).
   - Generating LaTeX tables summarizing top and bottom correlations.
   - Visualizing correlation networks and COMs in **Napari**.
-  - **Note**: Requires `.pkl` files generated from `2_tracking_refinement.ipynb`.
+  - **Note**: uses pre-filtered masks from `correlation_masks`.
 
 </details>
 
@@ -101,6 +107,10 @@ It is recommended to download [`Workflow.zip`](https://github.com/baltuni/Calciu
 ```bash
 User                                    # YourName
   │
+  ├── correlation_masks                 # folders with masked .tif files ready for correlation analysis are stored here
+  │   ├── ModelAB1                      # an instance of such a folder
+  │   └── YourNewModel                  # your instance of such a folder
+  │
   ├── masks_tracked                     # folders with masked .tif files are stored here
   │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
@@ -116,7 +126,7 @@ User                                    # YourName
   │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
-  ├── saved_models                      # folders with cellpose models are stored here
+  ├── saved_models                      # cellpose models are stored here
   │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
   │
@@ -176,22 +186,22 @@ code
 - Save segmented masks as `.tif` files.
 
 ### **📗 Track & Refine Masks**
-**Execute** `2_tracking_refinement.ipynb` **to track and refine cell segmentation:**
 - Load segmented masks from the previous step.
 - Filter cells by occurrence (`get_common_cells`).
 - Add a **Napari Points Layer** for manual removal of missegmented labels.
 - Calculate cell intensities and centers of mass using `cct_utils`.
 - Save the tracking and refinement results as `.pkl` files for correlation analysis.
 - Important: Ensure you have run `1_generate_masks.ipynb` before this.
+- Save a **preprocessed mask** to `correlation_masks` and a `.pkl` file for `3_correlation_analysis.ipynb`.
+- Important: This step eliminates the need for runtime mask filtering in `3_correlation_analysis.ipynb`.
 
 ### **📘 Correlation Analysis**
-**Execute** `3_correlation_analysis.ipynb` **to analyze fluorescence intensity correlations:**
 - Load `.pkl` tracking data and corresponding raw images/masks.
 - Normalize and smooth intensity traces for each cell.
 - Calculate cross-correlations and identify significant correlations via null distribution.
 - Generate LaTeX tables of top and bottom correlation pairs.
 - Visualize correlation networks and centers of mass in **Napari**.
-- Important: Ensure you have run `2_tracking_refinement.ipynb` before this.
+- Uses **preprocessed masks** from `2_tracking_refinement.ipynb`, skipping runtime filtering.
 
 </details>
 
@@ -203,6 +213,13 @@ This pipeline is designed for **time-lapse microscopy image analysis**, specific
 - **Tracking cell movement and morphological changes**.
 - **Measuring fluorescence intensity variations over time**.
 - **Detecting correlations and constructing interaction networks between cells.**.
+
+---
+
+## 🎓 Acknowledgments
+
+This project was created as part of my **Master’s thesis** at **KTH Royal Institute of Technology**, focusing on *calcium signaling dynamics in migrating epithelial cells*.  
+Special thanks to my supervisors and colleagues for their support and guidance throughout the project.
 
 ---
 
