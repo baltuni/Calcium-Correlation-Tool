@@ -377,36 +377,56 @@ def create_and_save_table(pairs, table_title, file_name, export_path, min_correl
     plt.show()
     print(f"{table_title} saved as: {table_image_path}")
 
-
-def generate_latex_table(pairs, title, label, file_name, latex_path, min_correlations_filtered):
+def generate_latex_table(top_pairs, bottom_pairs, title, label, file_name, latex_path, min_correlations_filtered):
     """
-    Generate and save a LaTeX table of cell correlation data.
+    Generate and save a LaTeX table combining Top 10 and Bottom 10 correlations with consistent spacing.
     """
     latex_table = rf"""\begin{{table}}[H]
 \centering
 \caption{{{f"{file_name.replace('_', ' ').replace('c', 'C')} - {title}"}}}
-    \begin{{tabularx}}{{\textwidth}}{{CCCC}}
+    \begin{{tabularx}}{{\textwidth}}{{CCCCCCCC}}
     \toprule[0.5pt]\toprule[0.5pt]\toprule[0.5pt]
-    \multicolumn{{1}}{{C}}{{\itshape Cell 1}} &
-    \multicolumn{{1}}{{C}}{{\itshape Cell 2}} &
-    \multicolumn{{1}}{{C}}{{\itshape\makecell[C]{{Max\\Correlation}}}} &
-    \multicolumn{{1}}{{C}}{{\itshape\makecell[C]{{Min\\Correlation}}}}\\
+    \multicolumn{{4}}{{c}}{{\textit{{Top 10}}}} & \multicolumn{{4}}{{c}}{{\textit{{Bottom 10}}}} \\
+    \cmidrule(lr){{1-4}} \cmidrule(lr){{5-8}}
+    \multicolumn{{1}}{{C}}{{\itshape $C_1$}} & 
+    \multicolumn{{1}}{{C}}{{\itshape $C_2$}} & 
+    \multicolumn{{1}}{{C}}{{\itshape \makecell{{Max\\Corr}}}} & 
+    \multicolumn{{1}}{{C}}{{\itshape \makecell{{Min\\Corr}}}} & 
+    \multicolumn{{1}}{{C}}{{\itshape $C_1$}} & 
+    \multicolumn{{1}}{{C}}{{\itshape $C_2$}} & 
+    \multicolumn{{1}}{{C}}{{\itshape \makecell{{Max\\Corr}}}} & 
+    \multicolumn{{1}}{{C}}{{\itshape \makecell{{Min\\Corr}}}} \\
     \midrule[0.5pt]\midrule[0.5pt]
 """
-    for idx, ((cell1, cell2), max_corr) in enumerate(pairs):
-        min_corr = next(min_corr_value for (c1, c2), min_corr_value in min_correlations_filtered if c1 == cell1 and c2 == cell2)
-        latex_table += f"        \\multicolumn{{1}}{{T}}{{{cell1}}} &\n        \\multicolumn{{1}}{{T}}{{{cell2}}} &\n        \\multicolumn{{1}}{{T}}{{{max_corr:.4f}}} &\n        \\multicolumn{{1}}{{T}}{{{min_corr:.4f}}}"
-        if idx < len(pairs) - 1:  # Not the last row
-            latex_table += " \\\\ \n        \\midrule\n"
-        else:  # Last row, no newline
-            latex_table += " \\\\"
+    max_len = max(len(top_pairs), len(bottom_pairs))
+    for idx in range(max_len):
+        if idx < len(top_pairs):
+            cell1_t, cell2_t = top_pairs[idx][0]
+            max_t = top_pairs[idx][1]
+            min_t = next(min_corr for (c1, c2), min_corr in min_correlations_filtered if c1 == cell1_t and c2 == cell2_t)
+            row_top = f"        \\multicolumn{{1}}{{T}}{{{cell1_t}}} &\n        \\multicolumn{{1}}{{T}}{{{cell2_t}}} &\n        \\multicolumn{{1}}{{T}}{{{max_t:.4f}}} &\n        \\multicolumn{{1}}{{T}}{{{min_t:.4f}}}"
+        else:
+            row_top = "        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{}"
+
+        if idx < len(bottom_pairs):
+            cell1_b, cell2_b = bottom_pairs[idx][0]
+            max_b = bottom_pairs[idx][1]
+            min_b = next(min_corr for (c1, c2), min_corr in min_correlations_filtered if c1 == cell1_b and c2 == cell2_b)
+            row_bottom = f"        \\multicolumn{{1}}{{T}}{{{cell1_b}}} &\n        \\multicolumn{{1}}{{T}}{{{cell2_b}}} &\n        \\multicolumn{{1}}{{T}}{{{max_b:.4f}}} &\n        \\multicolumn{{1}}{{T}}{{{min_b:.4f}}}"
+        else:
+            row_bottom = "        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{} &\n        \\multicolumn{1}{T}{}"
+
+        if idx < max_len - 1:
+            latex_table += f"{row_top} &\n{row_bottom} \\\\\n        \\midrule\n"
+        else:
+            latex_table += f"{row_top} &\n{row_bottom} \\\\"
 
     latex_table += rf"""
     \midrule[0.5pt]\midrule[0.5pt]\midrule[0.5pt]
     \end{{tabularx}}
 \label{{tab:{label}}}
 \end{{table}}"""
-    latex_file_name = f"{file_name}_{title.replace(' ', '_')}.tex"
+    latex_file_name = f"{file_name}_{title.replace(' ', '_')}_combined.tex"
     latex_file_path = os.path.join(latex_path, latex_file_name)
     with open(latex_file_path, "w") as file:
         file.write(latex_table)
