@@ -18,12 +18,12 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 - **Tracking cell movement** across frames.
 - **Correlation analysis** to uncover dynamic cellular behaviors.
 
-## 🏗 Repository Overview
+### 🏗 Repository Overview
 
 | 📂 File                      | 📌 Description                                          |
 | :--------------------------- | :-----------------------------------------------         |
 | 0_cct_utils.py               | Core segmentation, tracking, and analysis functions      |
-| 1_generate_masks.ipynb       | Generates segmentation masks from `.tif` images          |
+| 1_generate_masks.ipynb       | Generates segmentation masks from `.tif` images, with optional chunk-wise or frame-by-frame processing |
 | 2_tracking_refinement.ipynb  | Filters, refines, and saves tracked cell data            |
 | 3_correlation_analysis.ipynb | Performs correlation analysis on tracked cell properties |
 
@@ -44,11 +44,14 @@ This repository provides a pipeline for **cell segmentation, tracking, and corre
 
 ### `1_generate_masks.ipynb`
 - Implements the segmentation pipeline for generating cell masks.
+- Optional chunk-wise or frame-by-frame processing.
+  - Set `use_chunks=True` to split time-lapse data into manageable chunks.
+  - Set `use_chunks=False` to process the entire stack frame-by-frame with direct tracking.
 - Steps include:
   - Loading time-lapse microscopy data.
-  - Splitting the data into chunks for processing.
-  - Running segmentation using **Cellpose** on each chunk.
-  - Relabeling masks across chunks to ensure consistent tracking.
+  - Splitting the data into chunks (if enabled).
+  - Running segmentation using **Cellpose**.
+  - Relabeling masks across chunks or frames to ensure consistent tracking.
   - Saving segmented masks as `.tif` files.
 
 ### `2_tracking_refinement.ipynb`
@@ -180,9 +183,11 @@ code
 **Execute** `1_generate_masks.ipynb` **to segment cells in your microscopy data:**
 - Open the notebook in **VSCode**.
 - Load raw microscopy images from the specified directory.
-- Run the segmentation pipeline using **Cellpose**, splitting large files into chunks.
-- Relabel masks across chunks for consistent cell tracking.
-- Run the segmentation pipeline and generate cell masks.
+- Run the segmentation pipeline using **Cellpose**.
+- Choose between:
+  - **Chunk-wise processing**: Splits large files into manageable chunks for segmentation and tracking.
+  - **Frame-by-frame processing**: Processes the entire stack directly, tracking cells across frames.
+- Relabel masks to ensure consistent cell tracking across chunks or frames.
 - Save segmented masks as `.tif` files.
 
 ### **📗 Track & Refine Masks**
