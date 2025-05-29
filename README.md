@@ -123,8 +123,6 @@ User                                    # YourName
   │   └── latex                         # tex files for latex tables are saved here
   │
   ├── raw_data                          # folders with full framed raw .tif files
-  │   ├── ModelAB1                      # an instance of such a folder
-  │   └── YourNewModel                  # your instance of such a folder
   │
   ├── saved_models                      # cellpose models are stored here
   │   ├── ModelAB1                      # an instance of such a folder
