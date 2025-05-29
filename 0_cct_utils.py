@@ -1,17 +1,16 @@
 import os
 import numpy as np
+import tifffile
+import matplotlib.pyplot as plt
+import napari
 from datetime import date
 from scipy import ndimage
 from tifffile import imwrite
-from os.path import exists
 from tqdm import tqdm
 from scipy.spatial.distance import euclidean
-import matplotlib.pyplot as plt
-import napari
 from matplotlib import cm, colors
 from PIL import Image
 from scipy.ndimage import center_of_mass
-from scipy.spatial.distance import cdist
 
 # General Utilities
 def is_valid_com(com):
@@ -293,6 +292,40 @@ def get_significant_correlation_threshold(sorted_correlations, null_distribution
     return None, None
 
 # Visualization Utilities
+def save_raw_frames_as_pdfs(file_name, raw_file, save_dir):
+    with tifffile.TiffFile(raw_file) as tif:
+        frames = tif.asarray()
+
+    total_frames = frames.shape[0]
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Dynamically select 3 indices: first, middle, last
+    frame_indices = [0, (total_frames - 1) // 2, total_frames - 1]
+    suffixes = ['t0', 't1', 't2']
+
+    saved_files = []
+    for idx, suffix in zip(frame_indices, suffixes):
+        frame = frames[idx]
+
+        plt.figure(figsize=(6, 6))
+        plt.imshow(frame, cmap='gray')
+        plt.axis('off')
+
+        output_path = os.path.join(save_dir, f'{file_name}_{suffix}.pdf')
+        plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+        plt.close()
+
+        saved_files.append(output_path)
+
+    print(f"Saved frames for {file_name}:")
+    for f in saved_files:
+        print(f" - {f}")
+
+def save_napari_export(viewer, filename, scale_factor=1.0):
+    # Export the figure from the viewer (not a layer)
+    image = viewer.export_figure(path=filename, scale_factor=scale_factor, flash=False)
+    print(f"Screenshot saved as {filename}")
+
 def plot_network_and_cell_coms_in_napari(
     X, correlations_above_threshold, filtered_cell_comms, non_network_cell_coms_at_frame,
     frame_idx, export_path=None, plot_file_path=None
