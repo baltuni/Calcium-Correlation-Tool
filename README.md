@@ -107,6 +107,8 @@ It is recommended to download [`Workflow.zip`](https://github.com/baltuni/Calciu
 ```bash
 User                                    # YourName
   │
+  ├── CCT                               # store your .py and .ipynb files here
+  │
   ├── correlation_masks                 # folders with masked .tif files ready for correlation analysis are stored here
   │   ├── ModelAB1                      # an instance of such a folder
   │   └── YourNewModel                  # your instance of such a folder
@@ -120,7 +122,10 @@ User                                    # YourName
   │   └── YourNewModel                  # your instance of such a folder
   │
   ├── plots                             # plots are saved here
-  │   └── latex                         # tex files for latex tables are saved here
+  │   ├── intensity_plots               # intensity figures are saved here
+  │   ├── latex_tables                  # tex files for latex tables are saved here
+  │   ├── raw_plots                     # key frames for raw time-series are saved here
+  │   └── visualization_plots           # visualization figures are saved here
   │
   ├── raw_data                          # folders with full framed raw .tif files
   │
