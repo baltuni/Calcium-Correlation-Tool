@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import napari
 from matplotlib import cm, colors
 from PIL import Image
+from scipy.ndimage import center_of_mass
+from scipy.spatial.distance import cdist
 
 # General Utilities
 def is_valid_com(com):
@@ -36,6 +38,48 @@ def apply_smoothing_to_normalized(intensities_normalized, window_size, smoothing
     return filtered_intensities
 
 # Segmentation and Mask Utilities
+def fill_in_missing_labels_tracking(Y, max_frame_gap=1):
+    Y_filled = Y.copy()
+    n_frames = Y.shape[0]
+    unique_labels = np.unique(Y)
+    unique_labels = unique_labels[unique_labels != 0]
+
+    # Build trajectories for each label
+    trajectories = {}
+    for label in unique_labels:
+        centroids = []
+        for f in range(n_frames):
+            mask = (Y[f] == label)
+            if np.any(mask):
+                com = center_of_mass(mask)
+                centroids.append((f, com))
+        trajectories[label] = centroids
+
+    # Attempt to fill missing labels
+    for label, traj in trajectories.items():
+        present_frames = set(f for f, _ in traj)
+        for f in range(n_frames):
+            if f not in present_frames:
+                # Find nearest frame with this label
+                neighbor_frames = [f2 for f2, _ in traj if abs(f - f2) <= max_frame_gap]
+                if not neighbor_frames:
+                    continue
+                # Choose closest in time
+                closest_f = min(neighbor_frames, key=lambda nf: abs(nf - f))
+                # Predict centroid
+                predicted_com = [c for fr, c in traj if fr == closest_f][0]
+                predicted_com_int = tuple(map(int, predicted_com))
+
+                # Check if predicted location is free
+                if Y_filled[f][predicted_com_int] == 0:
+                    mask_neighbor = (Y[closest_f] == label)
+                    Y_filled[f][mask_neighbor] = label
+                elif Y_filled[f][predicted_com_int] != label:
+                    # Conflict: Decide based on trajectory density
+                    # Here we skip, but this could be improved
+                    print(f"Conflict: label {label} in frame {f}")
+    return Y_filled
+
 def get_cell_labels(masks):
     if len(masks.shape) == 3:
         return [np.unique(mask[mask != 0]) for mask in masks]
@@ -59,29 +103,35 @@ def assign_random_cell_labels(mask):
 def _save_masks(masks, name=None, savedir=None):
     name = name or str(date.today())
     if savedir:
-        if not exists(savedir):
+        if not os.path.exists(savedir):
             os.makedirs(savedir)
-        imwrite(f"{savedir}/{name}_masks.tif", masks)
-    else:
-        imwrite(f"{name}_masks.tif", masks)
+        output_file = os.path.join(savedir, name)
+    imwrite(output_file, masks, imagej=True, metadata={'axes': 'TYX'})
+    print(f"Final mask saved to: {output_file}")
 
-def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5, random_labels=False, save=False, name=None, savedir=None):
+def get_tracked_masks(masks, dist_limit=None, backtrack_limit=None, random_labels=False, save=False, name=None, savedir=None):
     tracked_masks = np.zeros_like(masks)
     COMs, roi_labels = get_centers_of_mass(masks)
+    
     if random_labels:
         tracked_masks[0] = assign_random_cell_labels(masks[0])
     else:
         tracked_masks[0] = masks[0]
+    
     used_labels = set(np.unique(tracked_masks[0]))
-    for imnr in range(len(masks)):
-        if imnr == 0: continue
+    
+    for imnr in tqdm(range(len(masks)), desc="Tracking frames", unit=" frames"):
+        if imnr == 0:
+            continue
         new_cells = 0
         ROI_labels_imnr = roi_labels[imnr]
-        if len(COMs[imnr]) == 0: continue
+        if len(COMs[imnr]) == 0:
+            continue
         for COM_idx, COM_label in zip(range(len(COMs[imnr])), ROI_labels_imnr):
             ref_im_idx = -10
             for k in range(1, backtrack_limit):
-                if imnr - k < 0: break
+                if imnr - k < 0:
+                    break
                 distances = np.linalg.norm(np.array(COMs[imnr - k]) - np.array(COMs[imnr][COM_idx]), axis=1)
                 if np.min(distances) < dist_limit:
                     ref_im_idx = imnr - k
@@ -95,8 +145,10 @@ def get_tracked_masks(masks, dist_limit=20, backtrack_limit=5, random_labels=Fal
                     cell_label += 1
             used_labels.add(cell_label)
             tracked_masks[imnr][masks[imnr] == COM_label] = cell_label
+
     if save:
         _save_masks(tracked_masks, name=name, savedir=savedir)
+    
     return tracked_masks
 
 def get_common_cells(tracked_masks, occurrence=80):
@@ -353,37 +405,13 @@ def plot_intensity_curves(cell1, cell2, correlation_data, frame_rate, intensitie
     plt.show()
 
 # Table Generation
-def create_and_save_table(pairs, table_title, file_name, export_path, min_correlations_filtered):
-    """
-    Create and save a table of cell correlation data using matplotlib.
-    """
-    table_data = []
-    for (cell1, cell2), max_corr in pairs:
-        min_corr = next(min_corr_value for (c1, c2), min_corr_value in min_correlations_filtered if c1 == cell1 and c2 == cell2)
-        table_data.append([cell1, cell2, max_corr, min_corr])
-
-    fig, ax = plt.subplots(figsize=(10, len(table_data) * 0.5))
-    ax.axis('off')
-    table = ax.table(cellText=table_data,
-                     colLabels=['Cell 1', 'Cell 2', 'Max Correlation', 'Min Correlation'],
-                     cellLoc='center', loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 1.2)
-
-    table_file_name = f"{file_name}_{table_title.replace(' ', '_').replace(',', '')}.png"
-    table_image_path = os.path.join(export_path, table_file_name)
-    plt.savefig(table_image_path, bbox_inches='tight', dpi=300)
-    plt.show()
-    print(f"{table_title} saved as: {table_image_path}")
-
 def generate_latex_table(top_pairs, bottom_pairs, title, label, file_name, latex_path, min_correlations_filtered):
     """
     Generate and save a LaTeX table combining Top 10 and Bottom 10 correlations with consistent spacing.
     """
     latex_table = rf"""\begin{{table}}[H]
 \centering
-\caption{{{f"{file_name.replace('_', ' ').replace('c', 'C')} - {title}"}}}
+\caption{{{f"{file_name.replace('_', ' ').replace('CON', 'Control').replace('OUA', 'Ouabain-treated').replace('cluster', 'Cluster ')} - {title}"}}}
     \begin{{tabularx}}{{\textwidth}}{{CCCCCCCC}}
     \toprule[0.5pt]\toprule[0.5pt]\toprule[0.5pt]
     \multicolumn{{4}}{{c}}{{\textit{{Top 10}}}} & \multicolumn{{4}}{{c}}{{\textit{{Bottom 10}}}} \\
@@ -426,7 +454,7 @@ def generate_latex_table(top_pairs, bottom_pairs, title, label, file_name, latex
     \end{{tabularx}}
 \label{{tab:{label}}}
 \end{{table}}"""
-    latex_file_name = f"{file_name}_{title.replace(' ', '_')}_combined.tex"
+    latex_file_name = f"{file_name}_correlations.tex"
     latex_file_path = os.path.join(latex_path, latex_file_name)
     with open(latex_file_path, "w") as file:
         file.write(latex_table)
