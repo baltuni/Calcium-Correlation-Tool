@@ -124,6 +124,7 @@ User                                    # YourName
   ├── plots                             # plots are saved here
   │   ├── intensity_plots               # intensity figures are saved here
   │   ├── latex_tables                  # tex files for latex tables are saved here
+  │   ├── manual_segmentation_plots     # manual_segmentation figures are saved here
   │   ├── raw_plots                     # key frames for raw time-series are saved here
   │   ├── segmentation_plots            # segmentation figures are saved here
   │   └── visualization_plots           # visualization figures are saved here
