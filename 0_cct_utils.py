@@ -326,6 +326,37 @@ def save_napari_export(viewer, filename, scale_factor=1.0):
     image = viewer.export_figure(path=filename, scale_factor=scale_factor, flash=False)
     print(f"Screenshot saved as {filename}")
 
+def save_napari_exports_batch(man_files, parent_dir, model_folder, output_folder):
+    """
+    Iterates over a list of man_file names, loads the corresponding raw and label TIFFs,
+    adds them to a Napari viewer, and saves the screenshots as PDFs.
+    """
+    for man_file in man_files:
+        # Set paths
+        manseg_path = os.path.normpath(os.path.join(parent_dir, "saved_models", model_folder, "cellpose_train"))
+        raw_frame = os.path.join(manseg_path, f"{man_file}.tif")
+        label_frame = os.path.join(manseg_path, f"{man_file}label.tif")
+        
+        # Load images
+        X = tifffile.imread(raw_frame)
+        Y = tifffile.imread(label_frame)
+
+        # Initialize Napari viewer (headless)
+        viewer = napari.Viewer()
+        viewer.add_image(X, name=f"{man_file}_raw")
+        viewer.add_labels(Y, name=f"{man_file}_mask", opacity=0.35)
+
+        # Set output filename and directory
+        os.makedirs(output_folder, exist_ok=True)
+        output_filename = os.path.join(output_folder, f"{man_file}.pdf")
+        
+        # Export screenshot
+        save_napari_export(viewer, output_filename)
+        
+        # Close the viewer after saving
+        viewer.close()
+        print(f"Exported {output_filename}")
+
 def plot_network_and_cell_coms_in_napari(
     X, correlations_above_threshold, filtered_cell_comms, non_network_cell_coms_at_frame,
     frame_idx, export_path=None, plot_file_path=None
